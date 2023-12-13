@@ -1,0 +1,201 @@
+#include <iostream>
+#include <iomanip>
+#include <windows.h>
+#include <math.h>
+
+using namespace std;
+
+double sum_pow(double* x,int n, int k)
+{
+  int sum = 0;
+  for (int i = 1; i < n; i++)
+  {
+    sum += pow(x[i], k);
+  }
+
+  return sum;
+}
+
+double sum_prav(double* x, double* y, int k, int n)
+{
+  int sum = 0;
+  for (int i = 0; i < n; i++)
+  {
+    sum += (y[i] * pow(x[i], k));
+  }
+
+  return sum;
+}
+
+void swap(int* p, int k1, int k2)
+{
+  int s1 = 0;
+  while (p[s1] != k1)
+    s1++;
+  int s2 = 0;
+  while (p[s2] != k2)
+    s2++;
+  p[s1] = k2;
+  p[s2] = k1;
+}
+
+int Max(int* p, double** a, int n, int k)
+{
+  double max = 0;
+  int maxs = p[k];
+
+  for (int i = k; i < n; i++)
+  {
+    if (abs(a[p[i]][k]) > max)
+    {
+      max = abs(a[p[i]][k]);
+      maxs = p[i];
+    }
+  }
+
+  return maxs;
+}
+void GausSh(int* p, double** a, int n, int k)
+{
+  int max = Max(p, a, n, k);
+
+  swap(p, p[k], max);
+
+  double del = a[max][k];
+  for (int j = k; j < n + 1; j++)
+    a[max][j] /= del;
+
+  for (int i = k + 1; i < n; i++)
+  {
+    del = a[p[i]][k];
+    for (int j = k; j < n + 1; j++)
+    {
+      a[p[i]][j] -= (a[p[k]][j] * del);
+    }
+  }
+
+}
+
+void Gaus(int* p, double* x, double** a, int n)
+{
+  int i, j;
+  for (int k = 0; k < n; k++)
+  {
+    GausSh(p, a, n, k);
+  }
+
+  double sumx;
+  for (i = n - 1; i >= 0; i--)
+  {
+    sumx = 0;
+    for (j = i + 1; j < n; j++)
+      sumx += a[p[i]][j] * x[j];
+    x[i] = a[p[i]][n] - sumx;
+  }
+
+  for (i = 0; i < n; i++)
+    cout << "a" << i << " = " << setprecision(20) << fixed << x[i] << endl;
+
+}
+
+
+int main()
+{
+
+  int N = 11;
+  int m = 2;
+
+  double* x = new double[N];
+  double* y = new double[N];
+
+  for (int i = 0; i < N; i++)
+  {
+    x[i] = i;
+  }
+
+  y[0] = 3;
+  y[1] = 87;
+  y[2] = 156;
+  y[3] = 210;
+  y[4] = 238;
+  y[5] = 252;
+  y[6] = 239;
+  y[7] = 211;
+  y[8] = 158;
+  y[9] = 90;
+  y[10] = -5;
+//3
+  double* powerx = new double[2 * m];
+
+  for (int i = 0; i < 2 * m; i++)
+  {
+    powerx[i] = sum_pow(x, N, i + 1);
+  }
+
+//4
+  double** sumx = new double*[m + 1];
+  for (int i = 0; i < m + 1; i++)
+  {
+    sumx[i] = new double[m + 2];
+  }
+
+  for (int l = 0; l < m + 1; l++)
+  {
+    for (int j = 0; j < m + 1; j++)
+    {
+      sumx[l][j] = powerx[l+j];
+
+    }
+  }
+  sumx[0][0] = N;
+  
+//5
+  double* prav = new double[m + 1];
+
+  for (int l = 1; l < m + 2; l++)
+  {
+    prav[l - 1] = sum_prav(x, y, l - 1, N);
+  }
+
+  for (int k = 0; k < m + 1; k++)
+  {
+  
+    sumx[k][m + 1] = prav[k];
+  }
+  
+//6
+  
+  int* p = new int[m + 1];
+  for (int i = 0; i < m + 1; i++)
+    p[i] = i;
+
+  double* a = new double[m + 1];
+
+  Gaus(p, a, sumx, m + 1);
+  
+//7
+  double s = 1 / (N - m), us = 0, ks = 0;
+  for (int i = 0; i < N; i++)
+  {
+    ks = y[i];
+    for (int j = 0; j < m + 1; j++)
+      ks -= a[j] * pow(x[i], j);
+    ks *= ks;
+    us += ks;
+  }
+
+  s *= us;
+  s *= s;
+  s = pow(s, 0.5);
+  cout << setprecision(50) << fixed << "q = " << s << endl;
+
+  delete[]p;
+  delete[]a;
+  delete[]x;
+  delete[]y;
+  delete[] powerx;
+  delete[]prav;
+  for (int i = 0; i < m + 1; i++)
+    delete[] sumx[i];
+
+}
