@@ -174,20 +174,21 @@ int main()
   Gaus(p, a, sumx, m + 1);
   
 //7
-  double s = 1 / (N - m), us = 0, ks = 0;
-  for (int i = 0; i < N; i++)
-  {
-    ks = y[i];
-    for (int j = 0; j < m + 1; j++)
-      ks -= a[j] * pow(x[i], j);
-    ks *= ks;
-    us += ks;
-  }
-
-  s *= us;
-  s *= s;
-  s = pow(s, 0.5);
-  cout << setprecision(50) << fixed << "q = " << s << endl;
+  double s =0, us = 0, ks = 0;
+	for (int i = 0; i < N; i++)
+	{
+		ks = y[i];
+		for (int j = 0; j < m + 1; j++)
+			ks -= a[j] * pow(x[i], j);
+		ks = pow(ks, 2);
+		us += ks;
+	}
+	double r = N - m - 1;
+	s = (1/r)* us;
+	//cout << s<< endl<< us<< endl;
+	
+	s = pow(s, 0.5);
+	cout << setprecision(50) << "q = " << s << endl;
 
   delete[]p;
   delete[]a;
